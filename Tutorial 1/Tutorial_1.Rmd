@@ -1,0 +1,1092 @@
+---
+title: "Tutorial 1: Introducción a R"
+author: "Felipe Bravo, Hernán Sarmiento, Gabriel Iturra, María José Zambrano"
+date: "Marzo 2023"
+output:
+  html_document:
+    number_sections: yes
+    theme: spacelab
+    toc: yes
+  pdf_document:
+    toc: yes
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+# Declaración
+
+Yo, **AGREGUE SU NOMBRE COMPLETO**, declaro que realicé los pasos de la presente actividad.
+
+# Instrucciones
+
+Los objetivos de este tutorial son:
+
+1.  Familiarizarse con el uso de RStudio, e
+2.  Interiorizarse con R para la manipulación de datos, leyendo y ejecutando este tutorial.
+
+# Introducción
+
+## Instalando los requisitos
+
+**Primero debe instalar R y RStudio:**
+
+-   **R:** Un lenguaje de programación para análisis estadístico y manipulación de datos.
+    Para descargarlo, vaya al siguiente enlace: <https://cran.rstudio.com/>
+
+-   **RStudio:** Actualmente es el IDE para R más popular.
+    Para descargarlo, vaya a <https://www.rstudio.com/products/rstudio/download/#download>
+
+## Instalar librerías
+
+**Copie y pegue** el siguiente código en la consola de R para instalar las librerías necesarias para este tutorial y el siguiente laboratorio:
+
+```{r, eval=F, message=F}
+install.packages("reshape")
+install.packages("tidyverse")
+install.packages("ggplot2")
+install.packages("tm")
+```
+
+## RStudio
+
+La interfaz de RStudio es sencilla.
+En el panel superior izquierdo se encuentra el editor de código fuente, en el panel inferior izquierdo está el intérprete, en el panel superior derecho se encuentra el ambiente o listado de variables cargadas, y en el panel inferior derecho está el explorador de archivos.
+Todo esto se puede apreciar en la figura de abajo.
+
+![](https://users.dcc.uchile.cl/~mquezada/cursos/cc5206/2019-1/rstudio.png)
+
+## RMarkdown
+
+Una metodología que se ha hecho muy popular en el análisis de datos es el uso de *notebooks* que mezclan contenido multimedia (texto, imágenes) con código fuente ejecutable, como este mismo documento.
+Esto también se conoce como *literate programming*.
+
+Para R existe el formato *RMarkdown*, que es Markdown aumentado con sintaxis de R, que se puede ejecutar dentro de RStudio.
+
+Por ejemplo, abra este documento en RStudio, posicione el cursor dentro del siguiente bloque de código, y presione `Ctrl+Shift+Enter`.
+
+```{r}
+x <- c(1, 2, 3)
+x^2
+```
+
+Puede presionar `Ctrl+Enter` para ejecutar una línea individual, o hacer click `Run` en la barra de herramientas que está sobre el editor.
+
+**Note que las tildes inversas y `{r}` no son parte del código fuente, sino que son una expresión de RMarkdown para denotar un bloque de código.**
+
+## Exportar este documento
+
+Para exportar este documento a otros formatos, haga click en `Knit` en la barra de herramientas, en `File -> Knit Document`, o presionando `Ctrl+Shift+K`.
+Probablemente RStudio pedirá descargar algunas librerías.
+El archivo será generado en el mismo directorio donde se encuentra el .Rmd.
+Ábralo para confirmar que fue generado correctamente.
+
+Se puede generar la versión HTML de este documento, lo que dará evidencia de que instaló las librerías necesarias para los siguientes laboratorios.
+
+## Problemas con la codificación
+
+Si en este tutorial tiene problemas respecto a las tildes, realice lo siguiente.
+En `Tools -> Global Options`.
+Luego, busque en el menú `Code -> Saving -> Default Text Encoding`.
+Presione `Change` y escoja `UTF-8`.
+Guarde sus cambios para finalmente re-abrir el archivo en la codificación correcta.
+Para ello, presione `File -> Reopen with Encoding` y seleccione la misma codificación anterior.
+
+# Comandos básicos de R
+
+Para ejecutar cada bloque, en el editor, posiciona el cursor en el código fuente correspondiente y presiona `Ctrl+Shift+Enter` para ejecutar el bloque completo, o `Ctrl+Enter` para ejecutar sólo la línea correspondiente.
+
+```{r}
+x <- c(1, 2, 3)
+x^2
+```
+
+Nota que cuando un bloque posee más de una instrucción, el *output* del bloque será la última instrucción escrita, por lo que si quieres ver el output individual de cada instrucción, deberás posicionarte sobre ésta y presionar `Ctrl+Enter` o hacer click en `Run` en la barra de herramientas.
+
+## Vectores
+
+```{r}
+# un vector cuyos valores son los enteros 1 2 3 
+c(1, 2, 3) 
+```
+
+```{r}
+# un vector cuyos valores son caracteres a,b,c
+c("a", "b", "c") 
+```
+
+```{r}
+# un vector cuyos valores tienen nombre
+c(a = 1, b = 2, c = 3) 
+```
+
+## Asignación
+
+```{r}
+# se asigna el valor 5 a la variable a
+a <- 5  
+```
+
+```{r}
+# la asignacion no imprime el resultado, para ello hay que llamar directamente a la variable
+a
+```
+
+```{r}
+# una forma de asignar y evaluar a la vez es usar paréntesis
+(a <- 5)
+```
+
+```{r}
+# se asigna un arreglo a a2
+a2 <- c(1, a + 1, a - 1)   
+a2
+```
+
+```{r}
+# se asigna un arreglo a a3 con encabezados incluidos 
+a3 <- c(a = 1, b = 2, c = a + 2) 
+
+names(a3) # muestro los encabezados de a3
+```
+
+```{r}
+# c() también sirve para "combinar" valores
+# de esta forma se puede adjuntar valores a un vector
+# nota que los números y caracteres son vectores de largo 1
+a <- c(1, 2, 3)
+b <- c(a, 4, 5, 6)
+b
+```
+
+## Operaciones sobre vectores
+
+```{r}
+# vector que va de 1 a 10
+seq(1, 10)
+```
+
+```{r}
+# azúcar sintáctico para lo anterior
+1:10
+```
+
+```{r}
+# vector que va de 1 a 9, cada 2
+seq(1, 10, 2)
+```
+
+```{r}
+# repetir un valor N veces
+rep(5, 3)
+# repetir un vector N veces
+rep(c(1, 2), 3)
+```
+
+```{r}
+# suma los valores de un vector
+sum(seq(1, 10, 2))
+
+# largo del vector
+length(c(1, 2, 3))
+```
+
+```{r}
+# Operaciones típicas
+# Nota que las funciones están vectorizadas, es decir, funcionan sobre escalares y vectores (recuerda que un escalar es un vector de largo 1)
+a <- c(1, 3, 5, 7)
+
+# Exponencial
+exp(a)
+# Suma
+sum(a)  
+# Logaritmo natural
+log(a) 
+# Log base 10
+log10(a)
+# Promedio
+mean(a) 
+# Desv estandar
+sd(a) 
+# Mediana
+median(a)
+```
+
+## Data frames
+
+Un data frame es una *tabla*, con filas y columnas.
+Cada columna debe tener nombre mientras que las filas pueden tener nombre, pero no es recomendable.
+
+```{r}
+# definimos una tabla con dos columnas, `x` e `y`, cuyos valores son como sigue
+d <- data.frame(x = c(10, 20, 30), y = c("a", "b", "c"), voltaje= rep(1,3))
+# Muestra todo el data frame, note como se crean los encabezados.
+d
+```
+
+```{r}
+# Para mostrar sólo la columna x.
+d$x 
+```
+
+```{r}
+# Para mostrar sólo la columna y.
+d$y 
+```
+
+```{r}
+# Para indicar el número de filas de d.
+nrow(d)  
+```
+
+```{r}
+# Para indicar el número de columnas de d.
+ncol(d)  
+```
+
+```{r}
+# Para indicar el número de filas y columnas de d
+dim(d)
+```
+
+Para ver ayuda se emplea `?` o `help()`
+
+```{r, eval=F}
+?sum   
+help(sum)
+```
+
+# Ejemplo: Datos de Accidentes de Tránsito en Chile
+
+Usaremos los datos de accidentes de tránsito en Chile en los años 2010 y 2011.
+
+Puedes descargar los datos al computador de las siguientes direcciones:
+
+<https://users.dcc.uchile.cl/~hsarmien/mineria/datasets/accidentes_2010_2011.txt> <https://users.dcc.uchile.cl/~hsarmien/mineria/datasets/afectados_2010_2011.txt>
+
+Si lo descargas a un directorio (por ejemplo `~/RDATA/`), debes indicarle a R cuál será el directorio de trabajo:
+
+```{r, eval=F}
+# Asignamos nuestro "working directory" (set w. d.) como el directorio ~/RDATA
+setwd("~/RDATA/")
+```
+
+Luego asignarle una variable a cada dataset mediante `read.table()`:
+
+```{r, eval=F}
+# Se asume que los archivos se encuentran en el w.d., si no los tienes descargados, lo siguiente fallará:
+tipos <- read.table("accidentes_2010_2011.txt")
+afectados <- read.table("afectados_2010_2011.txt")
+```
+
+Para cargar los datos remotamente:
+
+```{r}
+tipos <- read.table("https://users.dcc.uchile.cl/~hsarmien/mineria/datasets/accidentes_2010_2011.txt")
+afectados <- read.table("https://users.dcc.uchile.cl/~hsarmien/mineria/datasets/afectados_2010_2011.txt")
+```
+
+Esta última opción es conveniente porque son archivos pequeños.
+
+Siempre que llegue a sus manos un dataset, lo primero es hacer una revisión inicial para entender cómo están estructurados los datos.
+Esto significa, entender cuántos datos son, cuántas columnas, qué describe cada columna, el tipo de datos de las columnas, normalización de datos, entre otras cosas.
+
+En nuestro caso, el dataset `tipos` contiene la frecuencia de los distintos tipos de accidentes ocurridos en el 2010 y 2011, en Chile.
+Por otro lado, el dataset `afectados` contiene el estado de gravedad en que terminaron los accidente en Chile.
+Desde luego que ambos datasets se complementan.
+
+En el caso de tener problemas con las tildes a pesar de seguir los pasos de la sección [Problemas con la codificación], se recomienda usar el parámetro `encoding`.
+Por otro lado, al usar `read.table` los campos de caracteres (chr) son convertidos en tipo *Factor* por defecto.
+Para esto último, se recomienda usar el parámetro `as.is`:
+
+```{r}
+tipos <- read.table("https://users.dcc.uchile.cl/~hsarmien/mineria/datasets/accidentes_2010_2011.txt", encoding = "UTF-8", as.is = F)
+afectados <- read.table("https://users.dcc.uchile.cl/~hsarmien/mineria/datasets/afectados_2010_2011.txt", encoding = "UTF-8", as.is = F)
+```
+
+## Atributos de un dataset
+
+```{r}
+str(tipos)
+```
+
+Acá se muestra el nombre de los campos, el tipo de datos y una pequeña muestra de los datos.
+Cuando es *Factor* significa que el valor de ese campo toma un valor diferente un número limitado de veces.
+Por ejemplo, el campo *Muestra* tiene 3 tipos de valores "Comunal", "Nacional" y el otro no se alcanza a visualizar.
+Lo mismo con *Descripción*, es una "Factor" con 359 valores diferentes.
+En contraste, *Cantidad* es una valor continuo por lo tanto indica que es entero y se da una muestra de estos valores " 8247 8339.... etc".
+
+Ahora, lo mismo para afectados:
+
+```{r}
+str(afectados)
+```
+
+## Funciones `head` y `view`
+
+Con la función `head` podemos hacernos una idea de cómo son los datos, nos muestra los primeros 6 datos del dataset con los encabezados de cada atributo.
+Esto es útil para ver si los datos quedaron bien cargados o no (mejor mostrar unos pocos a mostrar todo el dataset completo).
+Mientras que la función `view` muestra el dataset completo.
+
+```{r}
+head(tipos)
+```
+
+```{r}
+nrow(tipos)
+```
+
+Ahora lo mismo para afectados:
+
+```{r}
+head(afectados)
+```
+
+```{r}
+nrow(afectados)
+```
+
+## Función `summary`
+
+La función `summary` aplica estadísticas a cada columna.
+En particular, indica el promedio, mediana, quantiles, valor máximo, mínimo, entre otros.
+
+```{r}
+summary(tipos)
+summary(afectados)
+```
+
+Aunque también podemos hacer el muestreo por separado empleando las siguientes funciones:
+
+```{r}
+# promedio columna Cantidad
+mean(tipos$Cantidad)
+
+# desviacion estandar
+sd(afectados$Cantidad) 
+
+# minimo (maximo)
+min(tipos$Cantidad)
+
+# mediana
+median(tipos$Cantidad) 
+
+# cuantiles, los valores que son mayores que una fracción $q$ de los datos
+quantile(tipos$Cantidad)
+
+quantile(tipos$Cantidad, probs = c(0, .5, .8, .9)) 
+
+# diferencia entre cuartil 3 y cuartil 1  (Q3 - Q1), o cuantil 0.75 y cuantil 0.25
+IQR(tipos$Cantidad)
+```
+
+# Consultas sobre data frames (proyección y filtro)
+
+Para proyectar o seleccionar columnas de una tabla, usamos el operador `$`.
+(Siempre emplearemos `head` para no alargar este manual).
+
+```{r}
+# muestra sólo la columna Cantidad
+# note que el resultado de esta operación es un Vector
+head(tipos$Cantidad)   
+```
+
+También podemos seleccionar columnas usando su índice en la tabla.
+
+```{r}
+# en R los índices parten desde 1
+# note que el output en este caso es un data frame
+head(tipos[5])
+```
+
+```{r}
+head(tipos["Cantidad"])
+```
+
+```{r}
+# se puede seleccionar más de una columna
+head(tipos[c(4, 5)])
+```
+
+```{r}
+head(tipos[c("TipoAccidente", "Cantidad")])
+```
+
+Ahora, para filtrar filas, usamos la notación **[filas, columnas]**.
+
+```{r}
+# fila 3, columna 5
+# el resultado es un vector
+tipos[3, 5]
+```
+
+```{r}
+# De la fila 3, muestra todas las columnas
+# el resultado es un data frame
+tipos[3, ] 
+```
+
+¡**OJO** con la coma dentro de los paréntesis!
+Si no la usas, estarás proyectando la columna 3 en vez de elegir la fila 3 y todas las columnas.
+
+```{r}
+head(tipos[3])
+```
+
+También podemos hacer referencia al nombre de la columna:
+
+```{r}
+# Muestra la columna Cantidad
+# en este caso, el output es un vector
+head(tipos[, c("Cantidad")]) 
+```
+
+También podemos ser más específicos.
+
+```{r}
+# Muestra los primeros 6 datos y las columnas seleccionadas
+tipos[0:6, c("Anio","TipoAccidente")]
+```
+
+Desde luego que podemos crear condiciones o filtros.
+
+```{r}
+# Para cada valor de la columna Anio, indica si es 2010 o no (mediante True y False)
+head(afectados$Anio == 2010) 
+```
+
+```{r}
+# Suma cuántos datos hay en la columna Anio con valor 2010
+sum(afectados$Anio == 2010) 
+```
+
+Una función util para contar cuantos valores son NA en una columna, es la siguiente:
+
+```{r}
+sum(is.na(afectados$Anio))
+```
+
+Para todas las columnas:
+
+```{r}
+sapply(afectados, function(x) sum(is.na(x)))
+```
+
+Por ejemplo que muestre sólo los datos del 2011:
+
+```{r}
+# Filtra los datos cuyo año es 2011 y muestra todas las columnas (notar que ahora no muestra TRUE/FALSE)
+head(afectados[afectados$Anio == 2011, ]) 
+```
+
+```{r}
+# Filtramos que la columna Anio sea 2011 y además que la columna Muestra sea Regional. Se muestran todas las columnas. 
+head(afectados[afectados$Anio == 2011 & afectados$Muestra == "Regional", ]) 
+```
+
+```{r}
+# Filtramos que la columna Anio sea 2011 y además que la columna Muestra sea Regional. Seleccionamos la Descripcion y la Cantidad
+head(afectados[afectados$Anio == 2011 & afectados$Muestra == "Regional", c("Descripcion", "Cantidad")])
+```
+
+Con `with` hacemos la misma clase de filtro, pero sin tener que usar la notación `$`:
+
+```{r}
+with(afectados, afectados[Anio == 2011 & Descripcion == "TEMUCO", ])
+```
+
+Más adelante veremos una forma más sencilla de realizar todas estas operaciones.
+
+# Operaciones sobre data frames
+
+## Aggregate
+
+Para saber cuántos muertos por accidentes hubo en todo Chile podemos emplear `aggregate`.
+Esto es similar a GROUP BY en SQL.
+
+```{r}
+# Aplica la función suma (sum) a la columna Cantidad en base a los datos de Estado
+aggregate(Cantidad ~ Estado, afectados, FUN=sum) 
+```
+
+Esta función hará grupos dentro de `afectados`, donde cada grupo estará asociado al mismo valor de `Estado`, y estará compuesto de todos los valores dados por `Cantidad`.
+A cada uno de estos grupos aplicará la función `FUN`, que en este caso es `sum`.
+Es decir, entregará la suma de las cantidades agrupadas por cada estado.
+
+La notación `X ~ Y` se llama *formula* en R.
+
+También podríamos ser más especificos y sumar la columna cantidad agrupando por `Estado` y `Anio`.
+
+```{r}
+aggregate(Cantidad ~ Estado + Anio, afectados, FUN=sum)
+```
+
+## Unique
+
+Con `unique` podemos obtener el conjunto de datos (sin repetir) de una columna.
+
+```{r}
+# muestra los valores diferentes que tiene la columna TipoAccidente.
+unique(tipos$TipoAccidente)
+```
+
+## Order y sort
+
+En algún momento vamos a requerir ordenar las columnas en base a uno o más atributos.
+Por ejemplo:
+
+```{r}
+# Para hacer el ejemplo pequeño, vamos a tomar los 10 primeros datos de afectados
+afectados_reducido <- afectados[1:10,]
+
+# Ordenar ascendentemente la columna Cantidad
+afectados_reducido[order(afectados_reducido$Cantidad), ] 
+```
+
+```{r}
+# Ordenar descendente la columna Cantidad
+afectados_reducido[order(afectados_reducido$Cantidad, decreasing = TRUE), ]
+```
+
+```{r}
+# Otra forma de ordenar descendente
+afectados_reducido[order(-afectados_reducido$Cantidad), ]
+```
+
+Otra forma de ordenar es usando `sort`.
+
+## Merge
+
+Tal como lo vimos al principio de este documento, para crear un nuevo data frame se usa `data.frame()`.
+Por ejemplo:
+
+```{r}
+a <- data.frame(x1 = 0:8, y1 = c(10,20,40,60,80,100,120,140,160))
+b <- data.frame(x1 = c(1,2,4,6,8,10), y2 = c(0,3,5,7,9,11))
+a
+b
+```
+
+También podemos hacer cruce entre ambos dataframes usando `merge`.
+Para hacerlo en base a la columna `x1`, sería:
+
+```{r}
+# Inner join 
+merge(a, b, by = "x1")
+```
+
+```{r}
+# Full outer join
+merge(a, b, by = "x1", all = T)
+```
+
+```{r}
+# Left outer join
+merge(a, b, by = "x1", all.x = T)
+
+# Right outer join
+merge(a, b, by = "x1", all.y = T)
+```
+
+## rowSums y colSums
+
+Para sumar toda las filas de un data frame:
+
+```{r}
+df <- data.frame(x1=1:10, y1=1:10)
+df
+```
+
+```{r}
+rowSums(df)  # suma cada fila de df
+rowSums(df[df$x1 > 5,])  # suma las filas cuyo x1 es mayor a 5
+```
+
+Para sumar las columnas de un data frame:
+
+```{r}
+colSums(df)
+```
+
+## Melt
+
+La librería `reshape` permite reformatear o manipular una matriz de datos.
+Primero, cargamos el paquete:
+
+```{r}
+library("reshape")
+```
+
+Consideremos el siguiente dataframe que contiene el registro de goles que convirtió Colo-Colo (CC) y la Universidad de Chile (U) en la primera y segunda jornada de la liga chilena:
+
+```{r}
+d <- data.frame(jornada = c(1,2,1,2),
+                equipo = c("CC", "CC", "U", "U"), 
+                favor = c(3, 2, 1, 5),
+                contra = c(0, 1, 2, 1))
+d
+```
+
+Por ejemplo, en la jornada 1, Colo-Colo hizo 3 goles (a favor) y no recibió goles en contra.
+En la misma jornada, la Universidad de Chile hizo 1 gol (a favor) y recibió 2 en contra.
+
+Si quiero saber el total de goles de la primera jornada es mediante la suma de las columnas favor y contra:
+
+```{r}
+f1 <- d[d$jornada == 1,]   
+sum(f1[, c(3,4)])  # c(3,4) indica que tomará la columna 3 y la 4. 
+sum(f1[, c("favor", "contra")])  # lo mismo 
+sum(d[d$jornada == 1, 3:4])        # lo mismo 
+```
+
+Ahora, algo más sofisticado es emplear `melt()` Esta función nos permitirá reformatear la tabla y dejar todos los goles en una sola columna.
+
+```{r}
+d2 <- melt(d, id=c("jornada", "equipo"))  # jornada y equipo queda fijo, se crea un registro para cada instancia
+d2   # observe qué es lo que hace
+```
+
+Con esto formateamos los datos de otra manera.
+En la función se le indica que deje fijas las columnas `jornada` y `equipo`, y cree un registro para cada instancia de `favor` y otro en `contra`.
+Además, observe el nombre de las nuevas columnas.
+
+Con esto podríamos sumar más fácilmente todos los goles de la primera fecha:
+
+```{r}
+f2 <- d2[d2$jornada == 1,]
+sum(f2$value)
+```
+
+# tidyverse
+
+Tidyverse (<https://www.tidyverse.org/>) es una "meta-librería", que apunta a tener mejores librerías para la manipulación de datos en R.
+Una de las librerías incluidas en tidyverse es `ggplot`.
+Otra de las quizás más importantes es `dplyr`, que nos permite manipular datos fácilmente, como veremos a continuación.
+
+```{r, message = F}
+library(tidyverse)
+```
+
+```{r}
+# Informacion del dataframe
+glimpse(afectados)
+```
+
+```{r}
+# Seleccionar una columna del dataframe
+afectados %>%
+  select(Cantidad) %>%
+  head()
+```
+
+El operador `%>%` nos permite "encadenar" instrucciones, muy similar a ggplot.
+`dplyr` nos provee funciones para proyectar (`select`), filtrar (`filter`), modificar o crear nuevas columnas (`mutate`), agrupar (`group_by` y `summarize`), ordenar (`arrange`) etc.
+
+```{r}
+afectados %>%
+  filter(Anio == 2010 & Muestra == "Comunal") %>%   # Año 2010 y solo comunas
+  group_by(Estado) %>%                       # Agrupamos por "muerto", "leve", etc
+  summarise(total = sum(Cantidad)) %>%              # Creamos una nueva columna a partir de cada grupo, llamada "total"
+  arrange(-total)           # Ordenamos descendentemente por "total"
+```
+
+Con `spread` y `gather` podemos modificar la forma de un data frame (como con `melt`).
+Piense en `spread` como su traducción literal: "esparcir" un data frame, de uno con pocas columnas a uno de varias columnas; y en `gather` como "recolectar" varias columnas en pocas columnas.
+
+Por ejemplo, queremos esparcir el Estado de los afectados por accidentes en varias columnas, y bajo cada columna poner la cantidad correspondiente:
+
+```{r}
+sp <- afectados %>%
+  spread(key = Estado, value = Cantidad)
+head(sp)
+```
+
+Luego, si queremos restaurar este data frame a su estado original, "recolectamos" las columnas:
+
+```{r}
+# en dplyr podemos generar un vector de nombres usando la notacion:
+# en este caso, `Graves:Muertos` creará un vector que considerará el orden del data frame original:
+# -> c(Graves, Leves, MenosGraves, Muertos)
+sp %>%
+  gather(Graves:Muertos, key = "Estado", value = "Cantidad") %>%
+  head()
+```
+
+# Gráficos
+
+Los gráficos son clave para mostrar tendencias o la distribución de los datos.
+En R existen varios tipos de gráficos.
+Veremos ejemplos de cada uno de ellos.
+
+## Plot
+
+Un gráfico básico que se emplea usando `plot()`.
+En el ejemplo se usa la exponencial e.
+
+```{r}
+plot(exp(1:10))
+```
+
+Con líneas:
+
+```{r}
+plot(exp(1:10), type = "l")
+```
+
+Si queremos agregarle decoración, como el título del gráfico y etiquetas a ambos ejes:
+
+```{r}
+plot(exp(1:10), main="Mi primer gráfico", xlab="eje x", ylab="eje y", type = "l")
+```
+
+## Boxplot
+
+Los `Boxplot`sirven para ver la distribución de los datos.
+Por ejemplo, para ver la distribución de los datos basado en muestra Regional y del año 2011:
+
+```{r}
+tipos2011 <- with(tipos,tipos[Muestra == "Regional" & Anio == 2011, ])
+plot(tipos2011$TipoAccidente, tipos2011$Cantidad)
+```
+
+Si se dan cuenta, hay dos outlier que no nos permiten ver bien los gráficos.
+Por ello, podemos ajustar el límite del eje y usando `ylim` y además agregar texto (con esto sacamos al outlier del gráfico):
+
+```{r}
+plot(tipos2011$TipoAccidente, tipos2011$Cantidad, ylim=c(0,4000), main="TITULO", 
+     xlab="eje x", ylab="eje y")
+     
+```
+
+Para jugar con el eje $x$, usamos `xlim` de la misma forma.
+
+## Barplot
+
+Otra opción es un gráfico de barras mostrando la cantidad de afectados.
+Primero hacemos el filtro, por ejemplo: muestra regional de muertos del 2011.
+Luego hacemos un gráfico de barras mostrando la cantidad por región (en este caso por la columna `Descripción`).
+
+```{r}
+head(afectados)
+```
+
+```{r}
+afect2011 <- with(afectados,
+                  afectados[ Muestra == "Regional" &
+                                Anio == 2011 &
+                              Estado == "Muertos", ])
+barplot(afect2011$Cantidad, names.arg = afect2011$Descripcion)
+```
+
+## Histograma
+
+Los histogramas sirven para agrupar los datos en clases.
+Luego se cuenta la cantidad de observaciones (o frecuencia) que hay en cada una de ellas.
+Por ejemplo:
+
+```{r}
+hist(afect2011$Cantidad)
+```
+
+## Densidad
+
+Una forma alternativa a los histogramas es hacer un gráfico de densidad de los datos.
+A veces la visualización de una gráfico de densidad es mejor que un histograma.
+
+```{r}
+plot(density(afect2011$Cantidad))
+```
+
+## ggplot2
+
+La librería `ggplot2` (<https://ggplot2.tidyverse.org>) permite hacer gráficos más elaborados.
+La idea principal detrás de `ggplot` es el uso de la "Gramática de Gráficos", que nos ayuda a generar gráficos con una sintaxis más cómoda, que separa los componentes de un gráfico en distintas "capas".
+
+```{r}
+library(ggplot2)  # cargamos la librería
+
+ggplot(afect2011) +   # asociamos un data frame a ggplot
+  geom_bar(aes(x = Descripcion, y = Cantidad), stat="identity") +   # creamos un gráfico de barras como una capa
+  coord_flip() +  # transformamos el gráfico invirtiendo los ejes de coordenadas (sólo visualmente)
+  ggtitle("Muertos por accidentes durante el 2011") + # título
+  xlab("Región (descripción)") + ylab("Frecuencia (cantidad)")  # etiquetas
+```
+
+La función `aes` nos permite hacer un mapeo desde columnas a variables visuales.
+En el ejemplo anterior, sólo usamos los ejes de coordenadas (`x` e `y`), pero podemos usar otras variables (`color`, `shape`, `fill`, `size`, `type` (tipo de línea), etc.).
+Podemos incluir `aes` dentro de cada capa por separado, o bien al comienzo, en la función `ggplot`, cuando queremos que todas las capas tengan el mismo mapeo.
+
+```{r}
+ggplot(tipos2011, aes(x = TipoAccidente, y = Cantidad)) + 
+  geom_boxplot()
+```
+
+```{r}
+ggplot(afect2011, aes(x=Cantidad)) + geom_histogram(binwidth = 50)
+```
+
+```{r}
+ggplot(tipos[tipos$Muestra == "Nacional", ], 
+       aes(x=TipoAccidente, y=Cantidad)) +
+  facet_grid(Anio ~ Descripcion) +
+  coord_flip() +
+  geom_bar(stat="identity")
+```
+
+Lo anterior se lee como: de la muestra `Nacional`, grafique `TipoAccidente` vs `Cantidad`, separados por `Anio`y `Descripcion`.
+
+# Manipulación de texto
+
+Si bien, para los humanos es fácil entender y representar el lenguaje (palabras, oraciones, etc), para un computador no es trivial.
+Para ello, debemos realizar ciertas operaciones para que estas sean comprendidas para el análisis.
+Para ello, usaremos una colección de mensajes de redes sociales.
+
+```{r}
+msj <- read.csv("http://users.dcc.uchile.cl/~hsarmien/mineria/datasets/messages.csv",sep = ";", quote = "\"'")
+```
+
+Este dataset, posee 2 columnas que corresponden al identificador y el cuerpo del mensaje.
+
+```{r}
+head(msj)
+```
+
+Crearemos una tercera columna en nuestro dataset el cual tendrá el texto (mensaje) sin tildes.
+Para ello usaremos una lista que contiene una especie de diccionario que convertirá un patrón en otro.
+
+```{r}
+replacement.list <- list('á' = 'a', 'é' = 'e', 'í' = 'i', 'ó' = 'o', 'ú' = 'u' ,'Á' = 'A', 'É' = 'E', 'Í' = 'I', 'Ó' = 'O', 'Ú' = 'U')
+
+msj <- msj %>% 
+      mutate(tweet_text_nacc = chartr(old = names(replacement.list) %>% str_c(collapse = ''), 
+                           new = replacement.list %>% str_c(collapse = ''),
+                           x = tweet_text))
+```
+
+## Bag-of-words
+
+La forma más tradicional de representar texto, es considerar cada elemento (token) de una cierta oración (párrafo, etc) y agregarlo como una columna en nuestro dataset.
+La idea principal es considerar, por ejemplo, si aparece o no una palabra en cierto documento o cuántas veces aparece en él.
+Por lo tanto, podríamos tener tantas columnas como elementos tengamos en la colección completa.
+Adicionalmente, consideraremos cada fila (cada mensaje) como un documento.
+
+Para lograr esto, utilizaremos la librería `tm` la cual permite realizar *text mining* en R.
+
+```{r, message=F}
+library(tm)
+```
+
+Convertiremos nuestro vector de mensajes de texto a uno que pueda ser leído por `tm`, donde habrán tantos documentos como mensajes de texto.
+Luego, crearemos un Corpus o colección de documentos.
+
+```{r}
+docs <- VectorSource(msj[, 3])
+docs <- VCorpus(docs)
+```
+
+Al ejecutar la siguiente instrucción, veremos resumidamente cómo está compuesto el Corpus o colección de documentos
+
+```{r, eval=F}
+inspect(docs)
+```
+
+## Pre-procesamiento de texto
+
+En un comienzo, el contenido de cada documento en nuestra colección contendrá mucha información que podría no ser relevante para nosotros.
+Por ejemplo, puntuaciones, números, palabras no relevantes, etc.
+Por ello, es necesario efectuar el pre-procesamiento y limpieza de los datos.
+
+### Remover puntuación
+
+```{r}
+docs <- tm_map(docs, removePunctuation)
+```
+
+### Remover números
+
+```{r}
+docs <- tm_map(docs, removeNumbers)
+```
+
+### Convertir a minúscula
+
+Esto es importante, ya que normalmente el procesamiento de texto es sensible a mayúscula o minúscula.
+
+```{r}
+docs <- tm_map(docs, content_transformer(tolower))
+```
+
+Notar que la función `tolower` se aplica sobre un vector de texto.
+Sin embargo, lo que poseemos es una colección de documentos representados como listas, los cuales a su vez poseen vectores de texto.
+Por esta razón, utilizamos la función `content_transformer` para aplicar `tolower` sobre todos los contenidos de los documentos.
+
+### Eliminar espacios en blanco innecesarios
+
+Por ejemplo, 2 o más espacios en blanco continuos, se transforman en uno solo.
+
+```{r}
+docs <- tm_map(docs, stripWhitespace)
+```
+
+### Reemplazar caracteres específicos
+
+La función `gsub` permite reemplazar ciertos caracteres o patrones dentro de un texto.
+En nuestro caso, aplicaremos la función sobre el contenido de cada documento.
+Por esta razón, utilizaremos `content_transformer` sobre `tm_map` y los otros parámetros son los que utilizará `gsub`.
+
+```{r}
+docs <- tm_map(docs, content_transformer(gsub), pattern = "/", replacement = "")
+docs <- tm_map(docs, content_transformer(gsub), pattern = '[[:digit:]]+', replacement = "")  #elimina cualquier digito
+```
+
+### Remover caracteres especiales no considerados por `removePunctuation`
+
+```{r}
+removeSpecialChars <- function(x) gsub("[^ñÑa-zA-Z0-9 ]","",x) #ojo que incluimos las letras ñ de forma literal
+docs <- tm_map(docs, content_transformer(removeSpecialChars))
+```
+
+## Matriz Documento-término
+
+Dado que necesitamos representar los datos de alguna manera, una forma tradicional de hacerlo es mediante una matriz.
+La idea principal es considerar cada documento como una fila, la cual a su vez tiene tantas columnas como términos existan en el corpus completo de documento (no por documento).
+De esta forma, podríamos conocer cuáles términos se repiten entre documentos (por ejemplo).
+
+Para esto, usaremos la función `DocumentTermMatrix`, que utilizará nuestra colección completa de documentos.
+
+```{r}
+dtm <- DocumentTermMatrix(docs)
+inspect(dtm)
+```
+
+Esta matriz, tendrá en cada celda `(i,j)` la frecuencia de un término `j` dentro del documento `i`.
+
+Además, algo interesante a ver acá, es el valor de *Sparsity*.
+Se tienen 400 documentos y 1906 términos, esto genera 400 \* 1906 = 762400 celdas.
+El valor de *Non\~/sparse entries* indica que 758745 celdas tienen como valor 0.
+Mientras que 3655 celdas tienen un valor diferente a 0.
+Por lo que el valor de *Sparsity* nos indica que de todas nuestras celdas en la matriz, un 99.5% (redondeando 100%) están con valores 0.
+Por lo tanto, esto nos puede señalar que hay términos que solo están presentes en ciertos documentos y no en la mayoría de ellos.
+
+Para ver el tamaño de la matriz, utilizaremos el siguiente comando:
+
+```{r}
+dim(dtm)
+```
+
+O para inspeccionar una parte de la matriz:
+
+```{r}
+inspect(dtm[1:3, 1:10])
+```
+
+### Transformar la DocumentTermMatrix en una matriz "visualizable"
+
+Dado que la función `DocumentTermMatrix` agrega más información aparte de solo la matriz (metadata), muchas veces nos gustaría visualizar la matriz de forma más sencilla.
+Para ello, transformaremos el contenido a una matriz.
+
+```{r}
+dtm.matrix <- as.matrix(dtm) 
+```
+
+### Términos más frecuentes
+
+Creamos un dataframe donde tendremos 2 columnas: una para el término y otra para la cantidad de veces que aparece en la colección completa.
+
+```{r}
+freq <- colSums(dtm.matrix)
+word_freq <- data.frame(word = names(freq), freq = freq, row.names = NULL)
+word_freq <- word_freq[order(-word_freq$freq),]
+```
+
+### Graficar términos más frecuentes
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+ggplot(word_freq[1:20,], aes(x = reorder(word, freq), y = freq)) +
+          geom_bar(stat = "identity") + 
+          coord_flip()+
+          ggtitle(label = "Top-20 palabras de la colección")
+```
+
+Como es posible apreciar, la mayor de estas palabras son aquellas que no entregan mayor significado a los documentos.
+Por ejemplo, artículos o preposiciones en su mayoría.
+Para solucionar este problema, podemos considerar una bolsa de palabras comunes llamada `stopwords`.
+Por lo tanto, eliminaremos palabras comunes para luego calcular la matriz nuevamente.
+
+Primero, podemos ver cuáles son las stopwords que considera la librería para el español:
+
+```{r}
+head(stopwords("spanish"),20)
+```
+
+Usando esta colección estándar, removeremos los stopwords:
+
+```{r}
+docs <- tm_map(docs, removeWords, stopwords("spanish"))
+```
+
+Si tuviéramos una colección de palabras como vector, también podríamos removerlas.
+Para ello, cargaremos un archivo externo con stopwords:
+
+```{r}
+stopwords_es <- read.table("https://users.dcc.uchile.cl/~hsarmien/mineria/datasets/stopwords_es.txt" , stringsAsFactors = F)
+head(stopwords_es)
+```
+
+Quitaremos las tildes de este vector utilizando algo similar a lo efectuado sobre la colección.
+En este caso, la codificación `latin1` pareciera transformar mejor los caracteres.
+
+```{r}
+stopwords_es$V1 <- iconv(stopwords_es$V1, from="latin1",to="ASCII//TRANSLIT")
+```
+
+Y eliminamos los stopwords en base a nuestra colección:
+
+```{r}
+docs <- tm_map(docs, removeWords, stopwords_es$V1)
+```
+
+```{r}
+dtm.sw <- DocumentTermMatrix(docs)
+dtm.sw.matrix <- as.matrix(dtm.sw)
+freq.sw <- colSums(dtm.sw.matrix)
+word_freq.sw <- data.frame(word = names(freq.sw), freq = freq.sw, row.names = NULL)
+word_freq.sw <- word_freq.sw[order(-word_freq.sw$freq),]
+```
+
+```{r}
+ggplot(word_freq.sw[1:20,], aes(x = reorder(word, freq), y = freq)) +
+          geom_bar(stat = "identity") + 
+          coord_flip()+
+          ggtitle(label = "Top-20 palabras de la colección sin stopwords")
+```
+
+# Información extra para ejecutar código R en la nube.
+
+Como mencionamos al inicio, una metodología que se ha hecho muy popular en el análisis de datos es el uso de *notebooks*.
+Para Python existe Jupyter Notebooks.
+En este sentido, Colaboratory es un servicio gratuito en la nube proporcionado por Google basado en Jupyter Notebooks.
+Donde se puede ejecutar código Python y R por hasta 12 horas.
+Si se reinician los recursos asignados, se perderán todos los datos que no hayan sido guardados.
+No solo es una gran herramienta para mejorar sus habilidades de codificación, sino que también provee un conjunto de bibliotecas preinstaladas para el análisis de datos.
+
+Uno de los aspectos más importantes de la popularidad de Colaboratory es que da acceso gratis a GPUs (Gracias Google).
+Los GPUs son parte esencial en la construcción de modelos de machine learning, como redes neuronales, para los que se animen a utilizarlas en sus proyectos.
+
+En este link <https://colab.research.google.com/github/IRkernel/IRkernel/blob/master/example-notebooks/Demo.ipynb> pueden encontrar un ejemplo de cómo comenzar a usar Google Colaboratory para ejecutar código R.
+Pueden salvar una copia a su Google Drive en la pestaña File o Archivo y tendrán su propio Notebook para ejecutar código R en la nube.
+
+# Referencias, lectura adicional
+
+-   Documentación de R: <https://www.rdocumentation.org>
+-   Markdown Basics. <https://rmarkdown.rstudio.com/authoring_basics.html>
+-   Visualizaciones con R: <https://www.r-graph-gallery.com/>
+-   R for Data Science. <http://r4ds.had.co.nz/>
+-   R code chunks and inline R code. <https://bookdown.org/yihui/rmarkdown/r-code.html>
+-   Tidyverse. <https://www.tidyverse.org/>
+-   Más sobre tidyverse. <https://users.dcc.uchile.cl/~mquezada/diplomado-2018/tutorial-datos.html>
+-   Tutorial de R en Colab <https://colab.research.google.com/github/IRkernel/IRkernel/blob/master/example-notebooks/Demo.ipynb>

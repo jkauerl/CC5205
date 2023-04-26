@@ -1,0 +1,207 @@
+---
+title: 'Laboratorio 1.2: Exploración y Visualización de Datos'
+author: "******************************* AGREGUE SU NOMBRE *******************************"
+date: "Abril 2023"
+output: 
+  html_document: 
+    theme: default
+    toc: yes
+---
+
+# Declaración de compromiso ético
+
+Nosotros Diego Ignacio Faúndez Ortega (Sección 2), Javier Ignacio Kauer Lara (Sección 2), declaramos que realizamos de manera grupal los pasos de la presente actividad. También declaramos no incurrir en copia, ni compartir nuestras respuestas con otras personas ni con otros grupos. Por lo que, ratificamos que las respuestas son de nuestra propia confección y reflejan nuestro propio conocimiento.
+
+# Instrucciones
+
+1.  Trabajen en equipos de dos personas. Salvo excepciones, no se corregirá entregas con menos de dos integrantes.
+
+2.  Modifique este archivo `.Rmd` agregando sus respuestas donde corresponda.
+
+3.  Para cada pregunta, cuando corresponda, **incluya el código fuente que utilizó para llegar a su respuesta**.
+
+4.  El formato de entrega para esta actividad es un archivo html. **Genere un archivo HTML usando RStudio** y súbalo a U-Cursos.
+
+Basta con que uno de los integrantes haga la entrega. Si ambos hacen una entrega en U-Cursos, se revisará cualquiera de éstas.
+
+# Laboratorio
+
+La primera parte de esta actividad son preguntas teóricas que avanzaron en las clases del curso de Minería de datos.
+
+## Teoría
+
+*1. ¿Cuál es la diferencia entre los atributos cualitativos y los cuantitativos? ¿Se puede transformar un atributo cuantitativo en cualitativo y viceversa? Ejemplifique.*
+
+**Respuesta: Los atributos cualitativos se refieren a descripciones no medibles propias del dato, por ejemplo: el color de ojo de una persona son verdes. Mientras que los atributos cuantitativos corresponden a caracterísitcas medibles del dato, como por ejemplo: la altura de una pesona es 1.79 metros...**
+
+*2. ¿Qué factores que ocasionan errores en el análisis de datos deben ser considerados para la limpieza de un set de datos? ¿Qué técnica estadística podría utilizar durante el proceso de limpieza? Ejemplifique con al menos una técnica.*
+
+**Respuesta: Los factores que ocasionan errores en el análisis de datos pueden ser errores en los datos en sí, como datos repetidos o datos vacíos, como también la presencia de outliers que ocasionen desviaciones incorrectas al realizar el análisis, y también puede ocurrir que el sesgo del que analiza genere una interpretación erronea de los datos. Para tratar estos errores se pueden utilizar tecnicas como la eliminación de datos, que puede aplicar para outliers, datos vacíos y datos repetidos, o el relleno de info o el intento de predecir los datos faltantes, para el caso de los datos vacíos. Estas soluciones dependen de la importancia y cantidad de datos y queda al criterio del que analiza. Para el caso donde el problema radica en esta última persona, se puede agrandar el equipo de analisis o intentar trabajar con extremo cuidado para evitar malas interpretaciones.**
+
+*3. Describa dos medidas de tendencia central y explique sus posibles utilidades para el análisis exploratorio de datos.*
+
+**Respuesta: Primero describiremos la media, la cual es la medida de tendencia central más popular y representa el valor promedio estimado que tendría un dato perteneciente al grupo que se mide. Se calcula sumando todos los datos y dividiendo el resultado por el total de datos. El problema de esta medida de tendencia central es que es muy sensible a los outliers, por lo que si hay outliers muy grandes, el valor obtenido será poco representativo. Por otro lado tenemos la mediana, la cual es el valor intermedio del grupo de datos a analizar, si estos son ordenados ascendente o descendentemente. Esta medida de tendencia central permite tener una resistencia a los outliers mayor que con la media, por lo que en ciertos casos suele ser más representativa. Ambas medidas de tendencia central nos permiten generar una idea general del aspecto de los datos y a su vez de sus valores esperados . Además nos permiten observar relaciones entre diferentes grupos de datos (Por ejemplo: Comparar el comportamiento promedio del clima en diferentes zonas del país).**
+
+
+*4. ¿Qué es una matriz de correlación y para qué sirve?*
+
+**Respuesta: Es una matriz que verifica el nivel de correlación entre dos variables. Los valores de esta van de -1 a 1, siendo el 1 una correlación completamente lineal y el -1 una inversamente lineal. Esta matriz permite averiguar el comportamiento de las variables de un dataset entre ellas y visualizar relaciones que a primera mano no se verían, lo que ayuda en la predicción del comportamiento de los datos al modificar una variable.**
+
+*5. ¿Cuál es la utilidad de las visualizaciones en el análisis de datos? Ejemplifique.*
+
+**Respuesta: La visualización de los datos es un componente vital a la hora del analisis de estos ya que permite ver graficamente las relaciones y comportamientos entre variables, haciendolo entendible y comprimido para que el ser humano pueda interpretarlo fácilmente. Un ejemplo podría ser el de una empresa de turismo que busca saber los lugares donde más van a vacacionar personas. Esto puede ser visualizado fácilmente con un grafico de barras y permite notar qué destinos son más cotizados y por ende en cuales hacer más negocios.**
+
+## Práctica (Todas las preguntas deben agregar código que respalde su respuesta).
+
+### Accidentes de tránsito
+
+Para esta sección utilizaremos un dataset real de número de accidentes de tránsito por localidad, el cual puede ser encontrado en el siguiente link: <http://datos.gob.cl/dataset/9348>. Para cargar el dataset ejecute el siguiente código:
+
+```{r}
+tipos <- read.table("https://users.dcc.uchile.cl/~hsarmien/mineria/datasets/accidentes_2010_2011.txt")
+head(tipos)
+```
+
+Explore el set de datos para responder las siguientes preguntas:
+
+1.  ¿Cuáles son las dimensiones del dataset (filas, columnas)? (Recuerde adjuntar código).
+
+```{r}
+# RESPUESTA
+dim(tipos)
+```
+R: Es (4296, 5).
+
+2.  ¿Qué describe cada línea del dataset? (ejemplifique tomando el dato de la fila 235, extienda la descripción)
+
+```{r}
+# RESPUESTA
+str(tipos[235, 1:5])
+```
+R: "Muestra" corresponde a una columna tipo carácter y categoriza territorialmente donde ocurrió el accidente.
+   "Descripción" corresponde a una columna tipo carácter y es el lugar específico en la muestra.
+   "Anio" corresponde a una columna tipo entero y es el año en el cual ocurrió la muestra.
+   "TipoAccidente" corresponde a una columna tipo carácter y qué clase de accidente fue.
+   "Cantidad" corresponde a una columna tipo entero y representa el número de accidentes que ocurrieron.
+
+3.  ¿Cuántos años diferentes abarca la información el dataset? Entregue una tabla que contenga los valores únicos que hay en la columna Anio.
+
+```{r}
+# RESPUESTA
+unique(tipos$Anio)
+
+```
+R: Este dataset abarca 2 años, el 2010 y el 2011.
+
+4.  Filtre los datos y genere un dataframe en el cual se indique la cantidad de accidentes tipo `Colision` que ocurrieron en el año `2011` y que no sean de la muestra `Nacional`.
+
+```{r}
+# RESPUESTA
+df_new <- tipos[(tipos$Muestra != "Nacional" & tipos$Anio == 2011), ]
+head(df_new)
+```
+
+5.  Filtre los datos para incluir sólo los accidentes ocurridos el año 2010 a nivel regional. Genere un boxplot donde se indique la cantidad de accidentes categorizado por tipo de accidente.
+
+```{r}
+# RESPUESTA
+df_new2 <- tipos[(tipos$Muestra == "Regional" & tipos$Anio == 2010), ]
+df_new2
+#plot(df_new2$TipoAccidente, df_new2$Cantidad, )
+library(ggplot2)
+
+ggplot(df_new2, aes(x = TipoAccidente, y = Cantidad)) + 
+  geom_boxplot() + ylim(0, 4000) + ggtitle("Accidentes ocurridos en el 2010 a nivel regional")
+
+```
+
+Este tipo de gráfico nos ayudará a entender como se distribuye los datos por cada tipo de accidentes. Es decir, podremos apreciar que tan dispersos o similares son los datos en todo el dataset. También, puede ser útil para observar valores atípicos u outliers en los datos.
+
+6.  ¿Qué otra forma de explorar los datos podría agregar para el dataset de Accidentes de tránsito y qué información adicional aporta? Adjunte el código necesario.
+
+```{r}
+# RESPUESTA
+library(ggplot2)
+
+ggplot(tipos[tipos$Muestra == "Regional", ], 
+       aes(x=Descripcion, y=Cantidad)) + #theme(axis.text.x = element_blank()) +
+  facet_grid(Anio ~ Muestra) + 
+#  coord_flip() +
+  geom_bar(stat="identity") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+R: Se puede hacer un par de graficos de barras que permitan visualizar como la cantidad de accidentes varió durante el periodo 2010-2011 en cada región del país. Este tipo de gráfico puede ser muy útil para verificar si una política de seguridad vial funcionó o si hay algunas regiones que tengan demasiados accidentes en comparación a las demás y a su cantidad de población.
+
+### Tweets con hashtag #GPT4
+
+A collection of tweets with the hashtag #GPT4 
+
+Considere el set de datos de tweets con el hashtag #GPT4 las siguientes columnas:
+
+-   date: fecha
+-   text: mensaje del tweet
+-   user_name: nombre de usuario
+-   user_location: lugar donde se emitio el tweet
+-   user_description: descripción del usuario
+-   user_created: fecha de creación del usuario
+-   user_followers: número de usuario que siguen al usuario de la observación
+-   user_friends: número de amigos de usuarios
+-   user_favourites: número de usuarios favoritos
+-   user_verified: si el usuario esta verificado o no
+-   hashtags: hashtags contenidos en el tweet.
+-   source: fuente del tweet.
+
+```{r}
+# Load Tweets dataset
+
+tweets <- read.csv("https://raw.githubusercontent.com/giturra/lab1.2/main/tweets.csv")
+head(tweets)
+
+```
+
+7. Transforme la columna user_verified (de variables categóricas "True" and "False") a 0 y 1
+
+```{r}
+# RESPUESTA
+tweets$user_verified[tweets$user_verified == "True"] <- 1
+tweets$user_verified[tweets$user_verified == "False"] <- 0
+tweets$user_verified <- as.integer(tweets$user_verified)
+head(tweets)
+
+```
+
+Realice una exploración por el set de datos para responder las siguientes preguntas:
+
+8.  ¿Qué columna/s posee/n valores en blanco o inexistentes? ¿Cómo manejaría esta situación? De dos soluciones distintas frente a este problema e implemente una de ellas en código.
+
+```{r}
+# RESPUESTA
+colSums(tweets == "")
+
+tweets$user_description[tweets$user_description == ""] <- "NA"
+tweets$user_location[tweets$user_location == ""] <- "NA"
+tweets$hashtags[tweets$hashtags == ""] <- "NA"
+tweets$user_name[tweets$user_name == ""] <- "NA"
+head(tweets)
+
+```
+R: Las columnas que poseen valores en blanco corresponden a: "user_description", "user_location", "hashtags", y "user_name". Una solución podría ser simplemente eliminar las columnas con los datos vacios, pero esto puede ocasionar perdida de información del contexto de los tweets, y de todas formas, al haber columnas con datos blancos son poco relevantes dentro dataset. La segunda solución corresponde a reemplazar los datos nulos en una columna por una agrupación nueva de datos llamada por ejemplo: sin información. En el código de arriba se encuentra la segunda solución.
+
+
+9.  Filtre el dataset y considere solamente los atributos numéricos.
+
+```{r}
+# RESPUESTA
+tweets1 <- tweets[, sapply(tweets, is.numeric)]
+head(tweets1)
+
+```
+
+10.  ¿Qué atributos están más correlacionados con la cantidad de seguidores ("user_followers") del dataset filtrado en la pregunta anterior? ¿Qué puede inferir a partir de esto?
+
+```{r}
+# RESPUESTA
+cor_tweets <- cor(tweets1[,1:4] )
+cor_tweets[1,2:4]
+```
+R: El atributo que esta más correlacionado con "user_followers" (el que tiene un valor más cercano a 1) es "user_verified". De esto se puede inferir que las cuentas que estan verificadas tienen más seguidores porque corresponden a, generalmente, celebridades o gente muy popular en twitter.

@@ -1,0 +1,192 @@
+---
+title: 'Laboratorio 1.1: Exploración y Visualización de Datos'
+date: "Marzo 2023"
+author: 'Diego Ignacio Faúndez Ortega y Javier Ignacio Kauer Lara'
+output:
+  html_document:
+    theme: default
+    toc: no
+  pdf_document:
+    toc: no
+---
+
+# Declaración de compromiso ético
+
+Nosotros Diego Ignacio Faúndez Ortega y Javier Ignacio Kauer Lara, declaramos que realizamos de manera grupal los pasos de la presente actividad. También declaramos no incurrir en copia, ni compartir nuestras respuestas con otras personas ni con otros grupos. Por lo que, ratificamos que las respuestas son de nuestra propia confección y reflejan nuestro propio conocimiento.
+
+# Instrucciones
+
+1.  Trabajen en equipos de dos personas. Salvo excepciones, no se corregirá entregas con menos de dos integrantes.
+
+2.  Modifique este archivo `.Rmd` agregando sus respuestas donde corresponda.
+
+3.  Para cada pregunta, cuando corresponda, **incluya el código fuente que utilizó para llegar a su respuesta**.
+
+4.  El formato de entrega para esta actividad es un archivo html. **Genere un archivo HTML usando RStudio** y súbalo a U-Cursos.
+
+Basta con que uno de los integrantes haga la entrega. Si ambos hacen una entrega en U-Cursos, se revisará cualquiera de éstas.
+
+# Laboratorio
+
+
+## Teoría
+
+Se esperan respuestas breves y concisas, descritas con sus propias palabras según sus conocimientos y lo visto en clase. En caso de incluir alguna referencia externa, deben citarla.
+
+
+*1. ¿Cuál es el objetivo de la Minería de datos y qué la diferencia de Machine Learning? Dé un ejemplo para explicar la diferencia.*
+
+**El objetivo de la minería de datos es obtener información útil a partir de grandes cantidades de datos y un entendimiento profundo de estos. La diferencia de esta área con la de Machine Learning radica en que esta última busca, a partir de los mismos datos, predecir comportamientos en base a parametros previamente definidos. Un ejemplo podría ser el caso de un auto que se conduce solo. Mientras que el machine learning se enfoca en predecir comportamientos dentro de el area donde se conduce, a partir de datos y experiencias previamente aprendidas (Ej: Funcionamiento de semaforos, detención de autos aledaños, cruces de peatones, entre otros), la minería de datos se enfoca en absorber los datos y/o problemas que se generan en cada viaje, para luego ser analizados y, en caso de haber problemas, que estos sean resueltos y generar una mejor experiencia para el usuario**
+
+*2. ¿Cuáles son los tipos de errores que podemos encontrar en los datos? Comenta brevemente cada uno*
+
+**Los errores que hay son: ruido y outliers, valores faltantes y datos duplicados. El primero correpsonde, en el caso del ruido, a datos inutiles que se tienen debido a la forma de medir u obtener los datos y generan una impureza a los datos con los que se quieren trabajar. Mientras que en el caso de outliers corresponden a unos pocos datos que se alejan de una tendencia clara, y se pueden ignorar. El segundo corresponde a, como dice su nombre, valores que no estan completos. Para resolver este problema se pueden ignorar estos datos, o cruzar con otros datos para intentar predecir sus valores. Por último, nuevamente como dice su nombre, corresponden a datos que se encuentran 2 o mas veces en el dataset, y se tienen que elimnar.**
+
+## Práctica
+
+Ahora vamos a la parte práctica, a jugar con los datos.
+
+![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr6Xzuys4So2QOt5VBlU-Zn6FQhQS3TPdcjQ&usqp=CAU){width='250px'}
+
+
+En esta parte de la actividad trabajaremos con un dataset de las 100 canciones más escuchadas en Spotify. El dataset lo pueden encontrar en: "https://www.kaggle.com/datasets/amaanansari09/most-streamed-songs-all-time?resource=download" junto con una decripción de este y también puede ser descargado desde ucursos. Este consiste de dos archivos "Features" que contiene 14 atributos "id","name","duration","energy", "key","loudness","mode","speechiness","acousticness","instrumentalness","liveness","valence","tempo", "danceability" y Streams el cual contiene 4 atributos: "Song","Artist", "Streams..Billions.", "Release.Date" 
+
+
+Para cargar los datos desde tu computador, usa:
+
+
+```{r}
+df_features <- read.csv("Features.csv", encoding = "UTF-8")
+df_streams <- read.csv("Streams.csv", encoding = "UTF-8")
+```
+
+
+También puedes cargarlos remotamente con:
+
+```{r}
+df_features <- read.csv("https://raw.githubusercontent.com/mzambrano1/Datasets-CC5205-otono-2023/master/Lab%201.1/Features.csv", encoding = "UTF-8")
+df_streams <- read.csv("https://raw.githubusercontent.com/mzambrano1/Datasets-CC5205-otono-2023/master/Lab%201.1/Streams.csv", encoding = "UTF-8")
+```
+
+
+**Por cada pregunta adjunte el código R que utilizó para llegar a la respuesta. Respuestas sin código no recibirán puntaje.**
+
+### Exploración básica
+
+1.  ¿Cuáles son las dimensiones de ambos dataframes (filas, columnas)? 
+
+```{r}
+# RESPUESTA
+dim(df_features)
+dim(df_streams)
+
+```
+
+
+2.  ¿Existen registros duplicados en alguno de los dataframes? 
+
+```{r}
+# RESPUESTA
+dim(unique(df_features))
+dim(unique(df_streams))
+
+# No.
+```
+
+
+3.  ¿Hay valores nulos en alguno de los dataframes?
+
+
+```{r}
+# RESPUESTA
+sum(is.na(df_features))
+sum(is.na(df_streams))
+
+# No.
+
+```
+
+
+### Análisis
+
+Ahora para hacer el análisis más sencillo juntaremos ambos datasets usando como llave el nombre de la canción.
+
+
+```{r}
+df_songs <- merge(df_features, df_streams, by.x = "name", by.y = "Song")
+df_songs
+```
+
+
+1.  Lista todos los artistas (sin repetirse) que tienen canciones en este top 100.
+
+
+```{r}
+# RESPUESTA
+unique(df_songs["Artist"])
+
+```
+
+
+2. ¿Hay algún artista que tenga más de una canción entre el top 100?.
+
+```{r}
+# RESPUESTA
+nrow(df_songs["Artist"]) - nrow(unique(df_songs["Artist"]))
+
+# Se puede observar que hay por lo menos 1 artista que tiene mas de una cancion en el top 100.
+```
+
+
+3. Lista las canciones que tienen una duración igual o mayor a 4 minutos. Usa la función head() para mostrar los primeros ejemplos que cumplen dicha condición. 
+
+```{r}
+# RESPUESTA
+head(df_songs[df_songs["duration"] >= 4,])
+
+```
+
+
+4. Encuentra las 3 canciones más bailables según el dataset. ¿Estás de acuerdo con que estas canciones sean las más bailables?
+
+```{r}
+# RESPUESTA
+df_songs[order(df_songs$danceability, decreasing = TRUE)[1:3], ]
+
+# Las 3 mas bailables son Moonlight, Humble y Without Me. Como grupo no estamos de acuerdo que sean las más bailable, incluso si no se limita a 3 canciones, podemos ver que Uptown Funk es menos "bailable" que Jocelyn Flores, y eso no tiene sentido.
+
+```
+
+
+5. Veamos cómo  se distribuyen la cantidad de streams de las canciones, agregue un título y etiquetas necesarias para que la visualización se entienda por sí misma. ¿Entre qué valores se concentran la cantidad de streams? ¿Qué puedes decir de la presencia de outliers? si los hay, indica cuales son.
+
+
+```{r}
+#Respuesta
+plot(df_songs[order(df_songs$Streams..Billions., decreasing = TRUE), ]$Streams..Billions., main= "Cantidad de Reproducciones vs Posición Top 100", xlab= "Posición", ylab= "Cantidad de reproducciones (Miles de millones)")
+
+# Los streams se concentran entre 1,5 y 2 miles de millones. Notamos que hay 2 canciones en especifico, las 2 primeras, que se comportan como outliers, y tienen muchas más reproducciones que las demas, estas son: Blinding Light de The Weeknd, y Shape of You de Ed Sheeran.
+```
+
+6. Ahora veamos que es lo que se relaciona más a las canciones más escuchadas. Para esto elige dos atributos que creas importantes en una canción y crea un gráfico para cada uno de como se relaciona con la cantidad de streams. Agrega un título y etiquetas necesarias para que la visualización se entienda por sí misma. ¿Que puedes concluir al respecto? ¿Como se suelen comportar las canciones más populares?
+
+
+```{r}
+#Respuesta
+plot(df_songs$danceability, df_songs$Streams..Billions., main= "Cantidad de Reproducciones vs Danceabilidad", xlab= "Danceabilidad", ylab= "Cantidad de reproducciones (Miles de millones)" )
+
+library(ggplot2)
+
+ggplot(df_songs, aes(x=key)) + geom_histogram() + labs(title= "Cantidad de Canciones con la misma Llave en el Top 100", x= "Llave", y= "Cantidad")
+
+# Se puede notar que en general las canciones que están en el Top 100, no existe una clara tendencia entre los outliers, y más aún en todo el Top 100 de canciones.
+
+```
+
+
+
+Y eso es todo por hoy :)
+ 
+ 
+![](https://pbs.twimg.com/media/Dn8ZmB_VYAEzn5r.jpg){width='300px'}
+
