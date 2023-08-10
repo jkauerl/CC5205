@@ -1,0 +1,177 @@
+---
+title: "Tutorial 4 - Reglas de Asociación en R"
+author: "Felipe Bravo, Hernán Sarmiento, Gabriel Iturra, María José Zambrano"
+date: "Junio 2023"
+output: 
+  html_document: 
+    theme: cosmo
+    toc: yes
+---
+
+Nombres: Javier Ignacio Kauer Lara
+
+
+# Conceptos básicos
+
+En el análisis de reglas de asociación (Association Rules) y de conjuntos de objetos frecuentes (Frequent Itemset Analysis) tenemos varios conceptos que son importantes de recordar para entender correctamente lo que hacen las reglas de asociación. Tomemos como ejemplo los datos de compras en un supermercado.
+
+- **Item**: Un objeto. Por ejemplo: leche, pañales, cerveza.
+- **Itemset**: Un conjunto de uno o más objetos. Por ejemplo: {pan, bebida}, {pan, leche, cerveza}.
+- **Transacción**: Una fila del dataset. Una transacción también es un itemset, ya que corresponde a un conjunto de objetos, pero una transacción es un dato del que disponemos y no un itemset arbitrario. Por ejemplo, una compra en el supermercado es una transacción, y esta puede contener múltiples objetos: {leche, pañales}, mientras que otra puede ser: {pan, leche, huevos}.
+- **Dataset**: Conjunto de transacciones. Corresponde a las compras del supermercado de las que disponemos.
+- **Regla de asociación**: Una regla del estilo $X \rightarrow Y$, donde $X$ e $Y$ son itemsets, y $X\cap Y =\emptyset$. Por ejemplo, {leche, yogurt} $\rightarrow$ {pan}. El lado izquierdo de la regla (LHS) se conoce como antecedente y el lado derecho (RHS) como consecuente. 
+
+Ojo que una regla de asociación *no* es una implicación lógica. Es decir, no necesariamente existe una relación de causalidad entre $X$ e $Y$, sino que de co-ocurrencia.
+
+Existen distintas medidas de interés sobre itemsets y reglas. Entre las más importantes están *support*, *confidence*, y *lift*:
+
+$$\sigma(X) = \text{# de veces que aparece }X \text{ en el dataset}$$
+$$\text{support}(X) = \frac{\sigma(X)}{N}$$
+
+$$\text{support}(X \rightarrow Y) = \frac{\sigma(X \cup Y)}{N}$$
+
+$$\text{confidence}(X \rightarrow Y) = \frac{\text{support}(X\rightarrow Y)}{\text{support}(X)} = \frac{\sigma(X \cup Y)}{\sigma(X)}$$
+$$\text{lift}(X\rightarrow Y) = \frac{\text{confidence}(X\rightarrow Y)}{\text{support}(Y)}$$
+
+Donde $N$ es la cantidad de transacciones (el tamaño del dataset).
+
+
+
+# Librerías
+En R instale el paquete `arules` (son varias las dependencias, por lo tanto, se recomienda instalar antes de la sesión):
+
+```{r eval=F}
+install.packages('arules')
+install.packages('arulesViz')
+```
+
+# Reglas de asociación en R
+
+El objetivo es encontrar reglas de asociación *interesantes* a partir de un dataset de transacciones. 
+
+Para ejemplificar, usaremos un dataset pequeño. 
+
+```{r, eval=T, warning=F}
+library('arules')  # cargamos arules
+df <- read.transactions("http://users.dcc.uchile.cl/~jherrera/mineria/datasets/compras.csv", sep=",")
+```
+
+Nota: Cada línea del archivo csv corresponde a los productos de una compra. 
+
+Para ver el dataset, empleamos `inspect`:
+
+```{r}
+inspect(df)   # para ver las reglas (si el dataset es largo, usar inspect(head(df))
+```
+
+Para ver un resumen:
+
+```{r}
+summary(df)
+```
+
+## Itemsets más frecuentes
+
+Para observar los itemsets más frecuentes, se definen umbrales (*thresholds*) de soporte, confianza, lift, etc. y se generan reglas cuya medida de interés sea mayor o igual a cada uno de estos umbrales. 
+
+Para esto usamos la función `eclat`. El parámetro `supp` filtra las reglas cuyo `support` sea mayor o igual a un valor. El parámetro `maxlen` indica la cantidad máxima de productos a considerar en un itemset. Por ejemplo, a continuación seleccionamos los itemsets que tengan `support` sobre 0.6, y que se compongan máximo de 10 objetos.
+
+
+```{r}
+frequentItems <- eclat(df, parameter = list(supp = 0.6, maxlen = 10))
+items.sorted <- sort(frequentItems, by="support")
+inspect(items.sorted)
+```
+
+También podemos graficar el top 10 de itemset más frecuentes:
+
+```{r}
+ itemFrequencyPlot(df, topN=10, type="absolute", main="Item Frequency")
+```
+
+## Algoritmo Apriori
+
+Para generar reglas de asociación usamos el algoritmo *Apriori*, que es parte del paquete `arules`. En el siguiente código ejecutamos el algoritmo tal que busque reglas con un `support` de al menos 0.2 y `confidence` 0.3. Luego ordenamos según el `lift` de cada regla.
+
+Nota: El parámetro `minlen` por defecto es 1, lo que significa que se crearán reglas con un solo elemento (es decir, un antecedente/LHS vacío) como {}	=>	{Corn}. Ver documentación con **help("apriori")**.
+
+
+```{r}
+rules <- apriori(df, parameter=list(support=0.2, confidence=0.3))
+rules.sorted <- sort(rules, by="lift")
+inspect(head(rules.sorted, 3))
+```
+
+El resultado de *Apriori* son las reglas de asociación cuyas asociaciones son más fuertes. Note que se entregan las medidas de `support`, `confidence` y `lift`.
+
+
+## Visualización de Reglas
+
+Mediante la librería "arulesViz" se pueden graficar las reglas de asociación. Puede servir para tener una panorámica de cómo se distribuyen respecto a las distintas métricas (https://rdrr.io/cran/arulesViz/f/inst/doc/arulesViz.pdf).
+
+Antes de visualizar las reglas, podemos filtrar aquellas que cumplen con algún criterio o seleccionar el top-n de reglas. Por ejemplo, seleccionar aquellas que tienen un `confidence` mayor a 0.8, o el top 10 de reglas con mayor `confidence`: 
+
+```{r}
+subrules <- rules[quality(rules)$confidence > 0.8]
+top_subrules <- head(rules, n = 10, by = "confidence")
+
+```
+
+A continuación crearemos distintos tipos de gráficos para visualizar nuestras reglas ´rules´.
+
+
+### Gráfico de dispersión (Scatter plot)
+
+A continuación un ejemplo sencillo usando "plot()"
+
+```{r}
+library('arulesViz') 
+plot(rules)
+
+#Podemos añadir otras medidas y personalizar nuestros gráficos:
+#plot(rules, measure = c("support", "lift"), shading = "confidence") 
+```
+También podemos crear una visualización interactiva usando `engine='plotly'`. Esta nos permite identificar las reglas y sus distintas métricas al pasar el cursor sobre cada punto.
+
+```{r}
+plot(rules, engine='plotly')
+```
+
+
+También podemos usar el color de los puntos para indicar el "orden", es decir, el número de elementos que contiene la regla. Esto nos daría una nueva dimensión que podemos analizar en conjunto con las métricas de los ejes x e y.  
+
+
+```{r}
+plot(rules, method = "two-key plot")
+
+#Podemos hacerla interactiva y visualizar las reglas según el "orden" (haciendo clic sobre los colores a ocultar/mostrar)
+#plot(rules, method = "two-key plot", engine='plotly') 
+
+```
+
+
+### Gráfico de matriz agrupada
+
+Gráfico de esferas con grupos de antecedentes como columnas y consecuentes como filas, donde el color y el tamaño representan las medidas de interés.
+
+```{r}
+plot(rules, method = "grouped")
+```
+
+### Grafos 
+
+En este gráfico los ítems y las reglas son representados como vértices conectados con aristas dirigidas. Las medidas de interés se representan mediante el color o el tamaño de los vértices. Esta visualización nos permite entender cómo se componen las reglas y cuáles items comparten entre ellas. 
+
+Para los siguientes gráficos seleccionamos las 20 reglas con mayor `lift`.
+
+
+```{r}
+subrules <- head(rules, n = 20, by = "lift")
+plot(subrules, method = "graph")
+
+```
+
+
+## Referencias
+
+Hahsler, Michael, and Sudheer Chelluboina. "Visualizing association rules: Introduction to the R-extension package arulesViz." R project module 6 (2011): 223-238. https://rdrr.io/cran/arulesViz/f/inst/doc/arulesViz.pdf
